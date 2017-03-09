@@ -62,19 +62,19 @@ def show_shopping_cart():
     """Display content of shopping cart."""
 
     cart = []
-    total = 0
+    cart_total = 0
 
     for melon_id, quantity in session['cart'].iteritems():
         melon = melons.get_by_id(melon_id)
 
-        melon.total_cost = quantity * melon.price
+        melon.total = quantity * melon.price
         melon.quantity = quantity
 
         cart.append(melon)
 
-        total += melon.total_cost  # calculate total cost of all melons
+        cart_total += melon.total  # calculate total cost of all melons
 
-    return render_template("cart.html", cart=cart, total=total)
+    return render_template("cart.html", cart=cart, total=cart_total)
 
 
 @app.route("/add_to_cart/<melon_id>")
