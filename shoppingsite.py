@@ -61,32 +61,20 @@ def show_melon(melon_id):
 def show_shopping_cart():
     """Display content of shopping cart."""
 
-    # TODO: Display the contents of the shopping cart.
-
-    # The logic here will be something like:
-    #
-    # - get the cart dictionary from the session
-    # - create a list to hold melon objects and a variable to hold the total
-    #   cost of the order
-    # - loop over the cart dictionary, and for each melon id:
-    #    - get the corresponding Melon object
-    #    - compute the total cost for that type of melon
-    #    - add this to the order total
-    #    - add quantity and total cost as attributes on the Melon object
-    #    - add the Melon object to the list created above
-    # - pass the total order cost and the list of Melon objects to the template
-    #
-    # Make sure your function can also handle the case wherein no cart has
-    # been added to the session
-
     cart = []
-    for key, value in session['cart'].iteritems():
-        melon = melons.get_by_id(key)
-        melon.total_cost = value * melon.price
-        melon.quantity = value
+    total = 0
+
+    for melon_id, quantity in session['cart'].iteritems():
+        melon = melons.get_by_id(melon_id)
+
+        melon.total_cost = quantity * melon.price
+        melon.quantity = quantity
+
         cart.append(melon)
 
-    return render_template("cart.html")
+        total += melon.total_cost  # calculate total cost of all melons
+
+    return render_template("cart.html", cart=cart, total=total)
 
 
 @app.route("/add_to_cart/<melon_id>")
@@ -99,9 +87,10 @@ def add_to_cart(melon_id):
 
     if session.get("cart"):
         session["cart"][melon_id] = session["cart"].get(melon_id, 0) + 1
-    else:
+    else:  # no cart has been created yet
         session["cart"] = {melon_id: 1}
 
+    #  Display verbose melon name
     flash(melons.get_by_id(melon_id).common_name + " was added to your cart!")
 
     print session["cart"]
